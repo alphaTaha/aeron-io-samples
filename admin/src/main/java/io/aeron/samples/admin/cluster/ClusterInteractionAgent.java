@@ -29,10 +29,9 @@ import io.aeron.samples.cluster.admin.protocol.DisconnectClusterDecoder;
 import io.aeron.samples.cluster.admin.protocol.ListAuctionsDecoder;
 import io.aeron.samples.cluster.admin.protocol.ListParticipantsDecoder;
 import io.aeron.samples.cluster.admin.protocol.MessageHeaderDecoder;
-import io.aeron.samples.cluster.protocol.AddAuctionBidCommandEncoder;
+
 import io.aeron.samples.cluster.protocol.AddParticipantCommandEncoder;
-import io.aeron.samples.cluster.protocol.CreateAuctionCommandEncoder;
-import io.aeron.samples.cluster.protocol.ListAuctionsCommandEncoder;
+
 import io.aeron.samples.cluster.protocol.ListParticipantsCommandEncoder;
 import io.aeron.samples.cluster.protocol.MessageHeaderEncoder;
 import org.agrona.DirectBuffer;
@@ -78,11 +77,8 @@ public class ClusterInteractionAgent implements Agent, MessageHandler
     private final AddAuctionBidDecoder addAuctionBidDecoder = new AddAuctionBidDecoder();
 
     private final MessageHeaderEncoder messageHeaderEncoder = new MessageHeaderEncoder();
-    private final CreateAuctionCommandEncoder createAuctionCommandEncoder = new CreateAuctionCommandEncoder();
     private final AddParticipantCommandEncoder addParticipantCommandEncoder = new AddParticipantCommandEncoder();
-    private final AddAuctionBidCommandEncoder addAuctionBidCommandEncoder = new AddAuctionBidCommandEncoder();
     private final ListParticipantsCommandEncoder listParticipantsCommandEncoder = new ListParticipantsCommandEncoder();
-    private final ListAuctionsCommandEncoder listAuctionsCommandEncoder = new ListAuctionsCommandEncoder();
 
     /**
      * Creates a new agent to interact with the cluster
@@ -190,22 +186,8 @@ public class ClusterInteractionAgent implements Agent, MessageHandler
         final MutableDirectBuffer buffer,
         final int offset)
     {
-        final String correlationId = UUID.randomUUID().toString();
+        System.out.println("\nprocessAddAuction Your service has been disconnected due to non payment of dues.");
 
-        addAuctionDecoder.wrapAndApplyHeader(buffer, offset, messageHeaderDecoder);
-        createAuctionCommandEncoder.wrapAndApplyHeader(sendBuffer, 0, messageHeaderEncoder);
-
-        createAuctionCommandEncoder.createdByParticipantId(addAuctionDecoder.createdByParticipantId());
-        createAuctionCommandEncoder.startTime(addAuctionDecoder.startTime());
-        createAuctionCommandEncoder.endTime(addAuctionDecoder.endTime());
-        createAuctionCommandEncoder.correlationId(correlationId);
-        createAuctionCommandEncoder.name(addAuctionDecoder.name());
-        createAuctionCommandEncoder.description(addAuctionDecoder.description());
-
-        pendingMessageManager.addMessage(correlationId, "add-auction");
-
-        retryingClusterOffer(sendBuffer, 0, MessageHeaderEncoder.ENCODED_LENGTH +
-            createAuctionCommandEncoder.encodedLength());
     }
 
     /**
@@ -243,18 +225,7 @@ public class ClusterInteractionAgent implements Agent, MessageHandler
         final MutableDirectBuffer buffer,
         final int offset)
     {
-        final String correlationId = UUID.randomUUID().toString();
-        addAuctionBidDecoder.wrapAndApplyHeader(buffer, offset, messageHeaderDecoder);
-        addAuctionBidCommandEncoder.wrapAndApplyHeader(sendBuffer, 0, messageHeaderEncoder);
-
-        addAuctionBidCommandEncoder.auctionId(addAuctionBidDecoder.auctionId());
-        addAuctionBidCommandEncoder.addedByParticipantId(addAuctionBidDecoder.addedByParticipantId());
-        addAuctionBidCommandEncoder.price(addAuctionBidDecoder.price());
-        addAuctionBidCommandEncoder.correlationId(correlationId);
-        pendingMessageManager.addMessage(correlationId, "add-auction-bid");
-
-        retryingClusterOffer(sendBuffer, 0, MessageHeaderEncoder.ENCODED_LENGTH +
-            addAuctionBidCommandEncoder.encodedLength());
+        System.out.println("\nprocessAddAuctionBid , Your service has been disconnected due to non payment of dues.");
     }
 
     /**
@@ -268,19 +239,6 @@ public class ClusterInteractionAgent implements Agent, MessageHandler
         pendingMessageManager.addMessage(correlationId, "list-participants");
         retryingClusterOffer(sendBuffer, 0, MessageHeaderEncoder.ENCODED_LENGTH +
             listParticipantsCommandEncoder.encodedLength());
-    }
-
-    /**
-     * Marshals the CLI protocol to cluster protocol for Listing all auctions
-     */
-    private void processListAuctions()
-    {
-        final String correlationId = UUID.randomUUID().toString();
-        listAuctionsCommandEncoder.wrapAndApplyHeader(sendBuffer, 0, messageHeaderEncoder);
-        listAuctionsCommandEncoder.correlationId(correlationId);
-        pendingMessageManager.addMessage(correlationId, "list-auctions");
-        retryingClusterOffer(sendBuffer, 0, MessageHeaderEncoder.ENCODED_LENGTH +
-            listAuctionsCommandEncoder.encodedLength());
     }
 
     /**
@@ -421,4 +379,11 @@ public class ClusterInteractionAgent implements Agent, MessageHandler
         }
         runningFlag.set(false);
     }
+
+    private void processListAuctions()
+    {
+        System.out.println("\nprocessAddAuctionBid , Your service has been disconnected due to non payment of dues.");
+    }
 }
+
+

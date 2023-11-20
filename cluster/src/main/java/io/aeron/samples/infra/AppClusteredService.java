@@ -23,7 +23,6 @@ import io.aeron.cluster.service.ClientSession;
 import io.aeron.cluster.service.Cluster;
 import io.aeron.cluster.service.ClusteredService;
 import io.aeron.logbuffer.Header;
-import io.aeron.samples.domain.auctions.Auctions;
 import io.aeron.samples.domain.participants.Participants;
 import org.agrona.DirectBuffer;
 import org.slf4j.Logger;
@@ -38,19 +37,15 @@ public class AppClusteredService implements ClusteredService
     private final ClientSessions clientSessions = new ClientSessions();
     private final SessionMessageContextImpl context = new SessionMessageContextImpl(clientSessions);
     private final ClusterClientResponder clusterClientResponder = new ClusterClientResponderImpl(context);
-    private final TimerManager timerManager = new TimerManager(context);
     private final Participants participants = new Participants(clusterClientResponder);
-    private final Auctions auctions = new Auctions(context, participants, clusterClientResponder,
-        timerManager);
-    private final SnapshotManager snapshotManager = new SnapshotManager(auctions, participants, context);
-    private final SbeDemuxer sbeDemuxer = new SbeDemuxer(participants, auctions, clusterClientResponder);
+    private final SnapshotManager snapshotManager = new SnapshotManager(participants, context);
+    private final SbeDemuxer sbeDemuxer = new SbeDemuxer(participants, clusterClientResponder);
 
     @Override
     public void onStart(final Cluster cluster, final Image snapshotImage)
     {
         snapshotManager.setIdleStrategy(cluster.idleStrategy());
         context.setIdleStrategy(cluster.idleStrategy());
-        timerManager.setCluster(cluster);
         if (snapshotImage != null)
         {
             snapshotManager.loadSnapshot(snapshotImage);
@@ -89,7 +84,7 @@ public class AppClusteredService implements ClusteredService
     public void onTimerEvent(final long correlationId, final long timestamp)
     {
         context.setClusterTime(timestamp);
-        timerManager.onTimerEvent(correlationId, timestamp);
+        LOGGER.error(" WHY IS THIS TIMER EVENT BEING FIRED? ");
     }
 
     @Override
